@@ -28,7 +28,7 @@
       },
       {
         "name": "manage_add_user",
-        "doc": " Add an account to the list of approved subaccount creators",
+        "doc": " 🧑‍💻 Admin\n Add an account to the list of approved subaccount creators",
         "kind": "call",
         "params": {
           "serialization_type": "json",
@@ -104,6 +104,7 @@
       },
       {
         "name": "new",
+        "doc": " 👋 init",
         "kind": "call",
         "modifiers": [
           "init"
@@ -131,7 +132,7 @@
       },
       {
         "name": "sub_create",
-        "doc": " Create a new subaccount with optional specific public key",
+        "doc": " 🚊 sub\n Create a new subaccount with optional specific public key",
         "kind": "call",
         "modifiers": [
           "payable"

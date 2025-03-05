@@ -3,6 +3,9 @@ use near_sdk::collections::{UnorderedSet};
 use near_sdk::{env, near_bindgen, AccountId, PanicOnDefault, Promise, PublicKey};
 use std::str::FromStr;
 
+
+
+
 #[near_bindgen]
 #[derive(BorshDeserialize, BorshSerialize, PanicOnDefault)]
 pub struct Contract {
@@ -16,8 +19,21 @@ pub struct Contract {
     created_subaccounts: UnorderedSet<AccountId>,
 }
 
+
+
+
+
+
+
+
+
 #[near_bindgen]
-impl Contract {
+impl Contract
+ // opening bracket
+{
+
+
+    /// 👋 init
     #[init]
     pub fn new(owner_id: AccountId, initial_public_key: Option<PublicKey>) -> Self {
         let mut contract = Self {
@@ -35,6 +51,16 @@ impl Contract {
         contract
     }
 
+
+
+
+
+
+
+
+
+
+    /// 🚊 sub
     /// Create a new subaccount with optional specific public key
     #[payable]
     pub fn sub_create(&mut self, name: String, public_key: Option<PublicKey>) -> Promise {
@@ -78,6 +104,17 @@ impl Contract {
         self.created_subaccounts.to_vec()
     }
 
+
+
+
+
+
+
+
+
+
+    /// 🧑‍💻 Admin
+
     /// Add an account to the list of approved subaccount creators
     pub fn manage_add_user(&mut self, account_id: AccountId) {
         self.assert_owner();
@@ -120,4 +157,10 @@ impl Contract {
             "Only owner can call this method"
         );
     }
-}
+
+
+
+
+
+
+} // closing bracket
