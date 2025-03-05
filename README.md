@@ -39,7 +39,7 @@ subaccount managment
 
 ```bash
 # Deploy the contract
-near deploy --accountId YOUR_ACCOUNT.near --wasmFile target/wasm32-unknown-unknown/release/sleet_managed_subaccounts.wasm
+near deploy --accountId YOUR_ACCOUNT.near --wasmFile dist/sleet_managed_subaccounts.wasm
 
 # Create a new subaccount
 near call YOUR_ACCOUNT.near sub_create '{"name": "myapp"}' --accountId YOUR_ACCOUNT.near
