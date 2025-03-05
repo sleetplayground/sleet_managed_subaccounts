@@ -31,8 +31,6 @@ cargo build --target wasm32-unknown-unknown --release
 
 # development commands
 cargo check
-cargo clippy
-cargo test
 cargo clean
 
 # deploy
