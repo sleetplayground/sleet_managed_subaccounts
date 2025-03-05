@@ -6,6 +6,7 @@ contract for creating and managing subaccounts.
 use cases:
 - an app that manages subaccounts for users.
 - a meme token launchpad.
+- trading with muli-accounts
 
 
 ---
@@ -24,10 +25,21 @@ cargo clean
 
 ```
 
+### Methods and Actions
+
+hello
+- get_greeting
+- set_greeting
+subaccount managment
+- sub_create
+- sub_manage, for adding and removing keys, and other things to the subaccount
+- sub_action, for doing actions as the subaccount
+- sub_list
+
+
+
 
 
 ---
-
-
 
 copyright 2025 by sleet.near
