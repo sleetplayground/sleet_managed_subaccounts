@@ -86,36 +86,6 @@ near view $CONTRACT manage_list_keys
 # Note: The subaccount list is maintained automatically by the contract.
 # If a subaccount is deleted, it will remain in the list
 
-# Create subaccount and deploy contract in one command
-# Note: Requires sufficient deposit for both account creation and contract deployment
-near call $CONTRACT sub_create '{"name": "myapp", "public_key": "ed25519:..."}' \
-  --accountId approved.near \
-  --deposit 5 \
-  && near deploy myapp.$CONTRACT \
-  --wasmFile path/to/contract.wasm \
-  --initFunction new \
-  --initArgs '{"arg1": "value1"}' \
-  --accountId approved.near
-
-# Alternative approach using shell function
-function deploy_to_sub() {
-    local subname=$1
-    local wasm_path=$2
-    local init_args=$3
-    
-    near call $CONTRACT sub_create \
-        "{\"name\": \"$subname\", \"public_key\": \"ed25519:...\"}" \
-        --accountId approved.near \
-        --deposit 5 \
-    && near deploy $subname.$CONTRACT \
-        --wasmFile $wasm_path \
-        --initFunction new \
-        --initArgs "$init_args" \
-        --accountId approved.near
-}
-
-# Usage example of the shell function
-# deploy_to_sub "myapp" "path/to/contract.wasm" '{"arg1": "value1"}'
 ```
 
 ---
