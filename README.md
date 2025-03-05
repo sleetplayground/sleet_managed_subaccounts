@@ -15,7 +15,7 @@ use cases:
 ```sh
 cargo near build
 cargo near build non-reproducible-wasm
-cargo near deploy build-reproducible-wasm
+cargo near build reproducible-wasm
 
 
 cargo check
