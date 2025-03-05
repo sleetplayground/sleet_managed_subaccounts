@@ -22,7 +22,21 @@ if ! command -v wasm-opt &> /dev/null; then
     exit 1
 fi
 
+# Install cargo-near if not installed
+if ! command -v cargo-near &> /dev/null; then
+    echo "cargo-near not found. Installing..."
+    cargo install cargo-near
+fi
+
 # Optimize the wasm file
 wasm-opt -Oz -o dist/sleet_managed_subaccounts.wasm $WASM_FILE
 
+# Generate ABI
+echo "Generating ABI..."
+cargo near abi
+
+# Move the generated ABI file to dist directory
+mv target/near/sleet_managed_subaccounts_abi.json dist//sleet_managed_subaccounts_abi.json
+
 echo "Build complete! Optimized WASM file is in dist/sleet_managed_subaccounts.wasm"
+echo "ABI file generated at dist/abi.json"
