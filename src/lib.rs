@@ -1,12 +1,10 @@
 use near_sdk::borsh::{self, BorshDeserialize, BorshSerialize};
 use near_sdk::collections::UnorderedMap;
-use near_sdk::json_types::Base58PublicKey;
-use near_sdk::{env, log, near, AccountId, Promise};
+use near_sdk::{env, near_bindgen, AccountId, Promise, NearToken, Gas, PublicKey};
 
+#[near_bindgen]
 #[derive(BorshDeserialize, BorshSerialize)]
-#[near(contract_state)]
 pub struct Contract {
-    // Map of subaccount ID to its master account
     subaccounts: UnorderedMap<AccountId, AccountId>,
 }
 
@@ -18,28 +16,25 @@ impl Default for Contract {
     }
 }
 
-#[near]
+#[near_bindgen]
 impl Contract {
-    /// Creates a new subaccount with the given name and optional public key
-    /// The master account's key will automatically be added to the subaccount
-    pub fn sub_create(&mut self, name: String, public_key: Option<Base58PublicKey>) -> Promise {
+    #[payable]
+    pub fn sub_create(&mut self, name: String, public_key: Option<PublicKey>) -> Promise {
         let caller = env::predecessor_account_id();
         let subaccount_id = format!("{name}.{caller}").parse().unwrap();
         
-        assert!(!self.subaccounts.contains_key(&subaccount_id), "Subaccount already exists");
+        assert!(!self.subaccounts.get(&subaccount_id).is_some(), "Subaccount already exists");
         
-        // Store the relationship between subaccount and master
         self.subaccounts.insert(&subaccount_id, &caller);
         
-        // Create the subaccount
-        Promise::new(subaccount_id)
+        Promise::new(subaccount_id.clone())
             .create_account()
             .transfer(env::attached_deposit())
             .add_full_access_key(env::signer_account_pk())
             .then(if let Some(key) = public_key {
                 Promise::new(subaccount_id).add_access_key(
-                    key.into(),
-                    0, // no allowance
+                    key,
+                    NearToken::from_near(0),
                     env::current_account_id(),
                     "sub_action,sub_manage".to_string(),
                 )
@@ -48,7 +43,6 @@ impl Contract {
             })
     }
 
-    /// Manages a subaccount by performing administrative actions
     pub fn sub_manage(
         &mut self,
         subaccount: AccountId,
@@ -65,23 +59,22 @@ impl Contract {
         match action.as_str() {
             "delete" => Promise::new(subaccount).delete_account(caller),
             "add_key" => {
-                let key: Base58PublicKey = args.unwrap()[0].parse().unwrap();
+                let key: PublicKey = args.unwrap()[0].parse().unwrap();
                 Promise::new(subaccount).add_access_key(
-                    key.into(),
-                    0,
+                    key,
+                    NearToken::from_near(0),
                     env::current_account_id(),
                     "sub_action".to_string(),
                 )
             }
             "remove_key" => {
-                let key: Base58PublicKey = args.unwrap()[0].parse().unwrap();
-                Promise::new(subaccount).delete_key(key.into())
+                let key: PublicKey = args.unwrap()[0].parse().unwrap();
+                Promise::new(subaccount).delete_key(key)
             }
             _ => env::panic_str("Invalid action"),
         }
     }
 
-    /// Executes actions on behalf of a subaccount
     pub fn sub_action(
         &mut self,
         subaccount: AccountId,
@@ -98,30 +91,36 @@ impl Contract {
         match action.as_str() {
             "transfer" => {
                 let receiver: AccountId = args[0].parse().unwrap();
-                let amount: u128 = args[1].parse().unwrap();
+                let amount = NearToken::from_yoctonear(args[1].parse::<u128>().unwrap());
                 Promise::new(receiver).transfer(amount)
+            }
+            "deploy" => {
+                let code = env::input().expect("No input");
+                Promise::new(subaccount).deploy_contract(code)
             }
             "call" => {
                 let contract: AccountId = args[0].parse().unwrap();
                 let method: String = args[1].parse().unwrap();
-                let args: Vec<u8> = args[2].as_bytes().to_vec();
+                let args_bytes = args[2].as_bytes().to_vec();
+                let deposit = NearToken::from_yoctonear(args[3].parse::<u128>().unwrap());
+                let gas: Gas = Gas::from_tgas(args[4].parse().unwrap());
+
                 Promise::new(contract).function_call(
                     method,
-                    args,
-                    env::attached_deposit(),
-                    env::prepaid_gas() / 2,
+                    args_bytes,
+                    deposit,
+                    gas,
                 )
             }
             _ => env::panic_str("Invalid action"),
         }
     }
 
-    /// Lists all subaccounts for a given master account
-    pub fn sub_list(&self, master_account: AccountId) -> Vec<AccountId> {
+    pub fn sub_list(&self, from_index: u64, limit: u64) -> Vec<(AccountId, AccountId)> {
         self.subaccounts
             .iter()
-            .filter(|(_, master)| master == &master_account)
-            .map(|(subaccount, _)| subaccount)
+            .skip(from_index as usize)
+            .take(limit as usize)
             .collect()
     }
 }
