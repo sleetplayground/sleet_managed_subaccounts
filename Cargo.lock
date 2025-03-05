@@ -3172,6 +3172,7 @@ dependencies = [
 name = "sleet_managed_subaccounts"
 version = "0.1.0"
 dependencies = [
+ "borsh",
  "near-sdk",
  "near-workspaces",
  "serde_json",

@@ -42,7 +42,7 @@ subaccount managment
 near deploy --accountId YOUR_ACCOUNT.near --wasmFile target/wasm32-unknown-unknown/release/sleet_managed_subaccounts.wasm
 
 # Create a new subaccount
-near call YOUR_ACCOUNT.near sub_create '{"prefix": "app", "suffix": "001"}' --accountId YOUR_ACCOUNT.near
+near call YOUR_ACCOUNT.near sub_create '{"name": "myapp"}' --accountId YOUR_ACCOUNT.near
 
 # Add full access key to subaccount
 near call YOUR_ACCOUNT.near sub_manage '{
