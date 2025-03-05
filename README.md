@@ -73,6 +73,18 @@ near call $CONTRACT sub_create '{"name": "test"}' --accountId approved.near
 
 # Create subaccount with additional key
 near call $CONTRACT sub_create '{"name": "test2", "public_key": "ed25519:..."}' --accountId approved.near
+
+# View all subaccounts
+near view $CONTRACT sub_list
+
+# View approved users
+near view $CONTRACT manage_list_users
+
+# View default public keys
+near view $CONTRACT manage_list_keys
+
+# Note: The subaccount list is maintained automatically by the contract.
+# If a subaccount is deleted, it will remain in the list
 ```
 
 ---
