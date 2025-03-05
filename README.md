@@ -13,8 +13,9 @@ use cases:
 ### Building and Testing
 
 ```sh
-cargo build
-
+cargo build --target wasm32-unknown-unknown --release
+# use build sh
+./build.sh
 
 cargo check
 cargo clippy
