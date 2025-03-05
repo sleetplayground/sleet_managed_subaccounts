@@ -1,53 +1,79 @@
-# sleet_managed_subaccounts
+# Sleet Managed Subaccounts
 
-contract for creating and managing subaccounts.
+A NEAR smart contract for creating and managing subaccounts with flexible public key management.
 
+## Overview
 
-use cases:
-- an app that manages subaccounts for users.
-- a meme token launchpad.
-- trading with muli-accounts
+This contract enables controlled creation and management of NEAR subaccounts with advanced public key management features. It allows approved users to create subaccounts and automatically adds predefined public keys to new subaccounts.
 
-> I orginaly ha the idea of a contract that could do and sign trasactions for subaccount, but that is beyond the scope of this project. the managed ascpec of this contract is the fact that the owner can set a public key that will be added to newly created accounts. currenlty only the owner and aprroved users can create subacounts.
+### Use Cases
+- Applications that manage subaccounts for users
+- Meme token launchpads
+- Trading with multiple accounts
+- Organizational account management
 
----
+> The contract focuses on subaccount creation and key management. While the original concept included transaction signing capabilities for subaccounts, that functionality is beyond the current scope. The "managed" aspect refers to the owner's ability to configure default public keys for new subaccounts and control who can create them.
 
-### Building and Testing
+## Features
+
+- Controlled subaccount creation (owner and approved users only)
+- Optional public key specification during subaccount creation
+- Automatic addition of predefined public keys to new subaccounts
+- Flexible user management for subaccount creation permissions
+- Comprehensive key management for default subaccount access
+
+## Building and Testing
 
 ```sh
 cargo build --target wasm32-unknown-unknown --release
-# use build sh
+# use build script
 ./build.sh
 
+# development commands
 cargo check
 cargo clippy
 cargo test
 cargo clean
 ```
 
-### Methods and Actions
+## Contract Methods
 
-new
-- init, with owner info and public key to use for subaccount creation.
-hello
-- greeting_get
-- greeting_set
-subaccount creation
-- sub_create
-- sub_list, to list all subaccounts
-owner management
-- manage_add_user, for adding a user that can call the subaccount creation method
-- manage_remove_user
--  manage_list_users
-- manage_add_key, for ading a key to the list of keys that will be added to subacounts
-- manage_remove_key, for removing a key from the list of keys that will be added to subacounts
-- manage_list_keys, for listing keys
+### Initialization
+- `new(owner_id: AccountId, initial_public_key: Option<PublicKey>)` - Initialize contract with owner and optional default public key
 
+### Subaccount Management
+- `sub_create(name: String, public_key: Option<PublicKey>)` - Create a new subaccount with optional specific public key
+- `sub_list()` - List all subaccounts created through this contract
 
-### CLI Usage Examples
+### Access Control
+- `manage_add_user(account_id: AccountId)` - Add an account to the list of approved subaccount creators
+- `manage_remove_user(account_id: AccountId)` - Remove an account from the list of approved creators
+- `manage_list_users()` - View all accounts approved for subaccount creation
 
+### Key Management
+- `manage_add_key(public_key: PublicKey)` - Add a public key to be included in all new subaccounts
+- `manage_remove_key(public_key: PublicKey)` - Remove a public key from the default set
+- `manage_list_keys()` - View all public keys that will be added to new subaccounts
 
+## CLI Usage Examples
+
+```bash
+# Initialize contract
+near call $CONTRACT new '{"owner_id": "owner.near", "initial_public_key": "ed25519:..."}'  --accountId owner.near
+
+# Add approved user
+near call $CONTRACT manage_add_user '{"account_id": "approved.near"}' --accountId owner.near
+
+# Add default public key
+near call $CONTRACT manage_add_key '{"public_key": "ed25519:..."}' --accountId owner.near
+
+# Create subaccount with default keys
+near call $CONTRACT sub_create '{"name": "test"}' --accountId approved.near
+
+# Create subaccount with additional key
+near call $CONTRACT sub_create '{"name": "test2", "public_key": "ed25519:..."}' --accountId approved.near
+```
 
 ---
 
-copyright 2025 by sleet.near
+Copyright 2025 by sleet.near
