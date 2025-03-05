@@ -13,9 +13,7 @@ use cases:
 ### Building and Testing
 
 ```sh
-cargo near build
-cargo near build non-reproducible-wasm
-cargo near build reproducible-wasm
+cargo build
 
 
 cargo check
@@ -23,8 +21,6 @@ cargo clippy
 cargo test
 cargo clean
 
-# deploy
-cargo near deploy build-reproducible-wasm <account-id>
 ```
 
 
