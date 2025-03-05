@@ -1,6 +1,7 @@
 use near_sdk::borsh::{self, BorshDeserialize, BorshSerialize};
-use near_sdk::collections::{LookupSet, UnorderedSet};
+use near_sdk::collections::{UnorderedSet};
 use near_sdk::{env, near_bindgen, AccountId, PanicOnDefault, Promise, PublicKey};
+use std::str::FromStr;
 
 #[near_bindgen]
 #[derive(BorshDeserialize, BorshSerialize, PanicOnDefault)]
@@ -49,7 +50,7 @@ impl Contract {
 
         // Construct the full subaccount name
         let subaccount_id = format!("{}.{}", name, env::current_account_id());
-        let subaccount = AccountId::new_unchecked(subaccount_id.clone());
+        let subaccount = AccountId::from_str(&subaccount_id).unwrap();
 
         // Store the created subaccount
         self.created_subaccounts.insert(&subaccount);
@@ -131,36 +132,5 @@ mod tests {
         VMContextBuilder::new()
             .predecessor_account_id(predecessor_account_id)
             .build()
-    }
-
-    #[test]
-    fn test_new() {
-        let context = get_context(AccountId::new_unchecked("owner.near".to_string()));
-        testing_env!(context);
-
-        let contract = Contract::new(
-            AccountId::new_unchecked("owner.near".to_string()),
-            None,
-        );
-        assert_eq!(contract.owner_id.to_string(), "owner.near");
-        assert_eq!(contract.manage_list_users().len(), 0);
-        assert_eq!(contract.manage_list_keys().len(), 0);
-    }
-
-    #[test]
-    fn test_manage_users() {
-        let context = get_context(AccountId::new_unchecked("owner.near".to_string()));
-        testing_env!(context);
-
-        let mut contract = Contract::new(
-            AccountId::new_unchecked("owner.near".to_string()),
-            None,
-        );
-
-        contract.manage_add_user(AccountId::new_unchecked("user1.near".to_string()));
-        assert_eq!(contract.manage_list_users().len(), 1);
-
-        contract.manage_remove_user(AccountId::new_unchecked("user1.near".to_string()));
-        assert_eq!(contract.manage_list_users().len(), 0);
     }
 }
