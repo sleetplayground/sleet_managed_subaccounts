@@ -121,16 +121,3 @@ impl Contract {
         );
     }
 }
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use near_sdk::test_utils::VMContextBuilder;
-    use near_sdk::{testing_env, VMContext};
-
-    fn get_context(predecessor_account_id: AccountId) -> VMContext {
-        VMContextBuilder::new()
-            .predecessor_account_id(predecessor_account_id)
-            .build()
-    }
-}
