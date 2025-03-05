@@ -1,7 +1,7 @@
 use near_sdk::borsh::{self, BorshDeserialize, BorshSerialize};
 use near_sdk::collections::UnorderedMap;
 use near_sdk::serde::{Deserialize, Serialize};
-use near_sdk::{env, near_bindgen, AccountId, Promise, NearToken, Gas};
+use near_sdk::{env, near_bindgen, AccountId, Promise, NearToken, Gas, Allowance};
 use std::str::FromStr;
 
 #[near_bindgen]
@@ -49,7 +49,7 @@ impl Contract {
             promise = promise.then(
                 Promise::new(subaccount_id).add_access_key_allowance(
                     pk,
-                    near_sdk::types::Allowance::default(),
+                    Allowance::unlimited(),
                     env::current_account_id(),
                     "sub_action,sub_manage".to_string()
                 )
@@ -78,7 +78,7 @@ impl Contract {
                 let pk = near_sdk::PublicKey::from_str(&args.unwrap()[0]).unwrap();
                 Promise::new(subaccount).add_access_key_allowance(
                     pk,
-                    near_sdk::types::Allowance::default(),
+                    Allowance::unlimited(),
                     env::current_account_id(),
                     "sub_action".to_string()
                 )
