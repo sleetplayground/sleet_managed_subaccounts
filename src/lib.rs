@@ -108,8 +108,12 @@ impl Contract {
             "transfer" => {
                 let receiver: AccountId = args[0].parse().unwrap();
                 let amount = NearToken::from_yoctonear(args[1].parse::<u128>().unwrap());
-                Promise::new(receiver).transfer(amount)
-            }
+                Promise::new(subaccount.clone())
+                    .transfer(amount)
+                    .then(
+                        Promise::new(receiver).transfer(amount)
+                    )
+            },
             "deploy" => {
                 let code = env::input().expect("No input");
                 Promise::new(subaccount).deploy_contract(code)
