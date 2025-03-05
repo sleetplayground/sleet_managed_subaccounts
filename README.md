@@ -34,6 +34,9 @@ cargo check
 cargo clippy
 cargo test
 cargo clean
+
+# deploy
+near deploy --wasmFile .dist/sleet_managed_subaccounts.wasm --accountId $CONTRACT_NAME
 ```
 
 ## Contract Methods
