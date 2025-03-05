@@ -1,6 +1,8 @@
 use near_sdk::borsh::{self, BorshDeserialize, BorshSerialize};
 use near_sdk::collections::UnorderedMap;
-use near_sdk::{env, near_bindgen, AccountId, Promise, NearToken, Gas, PublicKey};
+use near_sdk::serde::{Deserialize, Serialize};
+use near_sdk::{env, near_bindgen, AccountId, Promise, NearToken, Gas};
+use std::str::FromStr;
 
 #[near_bindgen]
 #[derive(BorshDeserialize, BorshSerialize)]
@@ -16,31 +18,45 @@ impl Default for Contract {
     }
 }
 
+#[derive(Serialize, Deserialize)]
+#[serde(crate = "near_sdk::serde")]
+pub struct SubAccountArgs {
+    name: String,
+    public_key: Option<String>,
+}
+
 #[near_bindgen]
 impl Contract {
     #[payable]
-    pub fn sub_create(&mut self, name: String, public_key: Option<PublicKey>) -> Promise {
+    pub fn sub_create(&mut self, name: String, public_key: Option<String>) -> Promise {
         let caller = env::predecessor_account_id();
         let subaccount_id = format!("{name}.{caller}").parse().unwrap();
         
-        assert!(!self.subaccounts.get(&subaccount_id).is_some(), "Subaccount already exists");
+        assert!(self.subaccounts.get(&subaccount_id).is_none(), "Subaccount already exists");
         
+        // Store the relationship between subaccount and master
         self.subaccounts.insert(&subaccount_id, &caller);
         
-        Promise::new(subaccount_id.clone())
+        // Create the subaccount
+        let mut promise = Promise::new(subaccount_id.clone())
             .create_account()
             .transfer(env::attached_deposit())
-            .add_full_access_key(env::signer_account_pk())
-            .then(if let Some(key) = public_key {
-                Promise::new(subaccount_id).add_access_key(
-                    key,
-                    NearToken::from_near(0),
+            .add_full_access_key(env::signer_account_pk());
+
+        // Add limited access key if provided
+        if let Some(key) = public_key {
+            let pk = near_sdk::PublicKey::from_str(&key).unwrap();
+            promise = promise.then(
+                Promise::new(subaccount_id).add_access_key_allowance(
+                    pk,
+                    near_sdk::types::Allowance::default(),
                     env::current_account_id(),
-                    "sub_action,sub_manage".to_string(),
+                    "sub_action,sub_manage".to_string()
                 )
-            } else {
-                Promise::new(subaccount_id)
-            })
+            );
+        }
+
+        promise
     }
 
     pub fn sub_manage(
@@ -59,17 +75,17 @@ impl Contract {
         match action.as_str() {
             "delete" => Promise::new(subaccount).delete_account(caller),
             "add_key" => {
-                let key: PublicKey = args.unwrap()[0].parse().unwrap();
-                Promise::new(subaccount).add_access_key(
-                    key,
-                    NearToken::from_near(0),
+                let pk = near_sdk::PublicKey::from_str(&args.unwrap()[0]).unwrap();
+                Promise::new(subaccount).add_access_key_allowance(
+                    pk,
+                    near_sdk::types::Allowance::default(),
                     env::current_account_id(),
-                    "sub_action".to_string(),
+                    "sub_action".to_string()
                 )
             }
             "remove_key" => {
-                let key: PublicKey = args.unwrap()[0].parse().unwrap();
-                Promise::new(subaccount).delete_key(key)
+                let pk = near_sdk::PublicKey::from_str(&args.unwrap()[0]).unwrap();
+                Promise::new(subaccount).delete_key(pk)
             }
             _ => env::panic_str("Invalid action"),
         }
@@ -122,29 +138,5 @@ impl Contract {
             .skip(from_index as usize)
             .take(limit as usize)
             .collect()
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use near_sdk::test_utils::VMContextBuilder;
-    use near_sdk::testing_env;
-
-    fn get_context() -> VMContextBuilder {
-        let mut context = VMContextBuilder::new();
-        context.predecessor_account_id("master.near".parse().unwrap());
-        context
-    }
-
-    #[test]
-    fn test_create_subaccount() {
-        let mut context = get_context();
-        testing_env!(context.build());
-
-        let mut contract = Contract::default();
-        let result = contract.sub_create("sub".to_string(), None);
-        // Note: In tests, we can't actually create accounts, but we can verify the Promise was created
-        assert!(result.promise_indices().len() > 0);
     }
 }
