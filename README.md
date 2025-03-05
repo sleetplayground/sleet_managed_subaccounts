@@ -8,6 +8,7 @@ use cases:
 - a meme token launchpad.
 - trading with muli-accounts
 
+> I orginaly ha the idea of a contract that could do and sign trasactions for subaccount, but that is beyond the scope of this project. the managed ascpec of this contract is the fact that the owner can set a public key that will be added to newly created accounts. currenlty only the owner and aprroved users can create subacounts.
 
 ---
 
@@ -26,47 +27,26 @@ cargo clean
 
 ### Methods and Actions
 
+new
+- init, with owner info and public key to use for subaccount creation.
 hello
-- get_greeting
-- set_greeting
-subaccount managment
+- greeting_get
+- greeting_set
+subaccount creation
 - sub_create
-- sub_manage, for adding and removing keys, and other things to the subaccount like deleteing and depoying contracts
-- sub_action, for doing actions as the subaccount
 - sub_list, to list all subaccounts
+owner management
+- manage_add_user, for adding a user that can call the subaccount creation method
+- manage_remove_user
+-  manage_list_users
+- manage_add_key, for ading a key to the list of keys that will be added to subacounts
+- manage_remove_key, for removing a key from the list of keys that will be added to subacounts
+- manage_list_keys, for listing keys
+
 
 ### CLI Usage Examples
 
-```bash
-# Deploy the contract
-near deploy --accountId YOUR_ACCOUNT.near --wasmFile dist/sleet_managed_subaccounts.wasm
 
-# Create a new subaccount
-near call YOUR_ACCOUNT.near sub_create '{"name": "myapp"}' --accountId YOUR_ACCOUNT.near
-
-# Add full access key to subaccount
-near call YOUR_ACCOUNT.near sub_manage '{
-  "sub_account": "app001.YOUR_ACCOUNT.near",
-  "action": "AddFullAccessKey",
-  "public_key": "ed25519:XXXXX"
-}' --accountId YOUR_ACCOUNT.near
-
-# Execute action as subaccount (e.g., transfer NEAR)
-near call YOUR_ACCOUNT.near sub_action '{
-  "sub_account": "app001.YOUR_ACCOUNT.near",
-  "action": {
-    "Transfer": {
-      "amount": "1000000000000000000000000",
-      "receiver_id": "recipient.near"
-    }
-  }
-}' --accountId YOUR_ACCOUNT.near
-
-# List all subaccounts
-near view YOUR_ACCOUNT.near sub_list '{"from_index": 0, "limit": 10}'
-```
-
-Note: Replace `YOUR_ACCOUNT.near` with your actual account name.
 
 ---
 
