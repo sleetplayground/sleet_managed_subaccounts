@@ -10,12 +10,20 @@ use cases:
 
 ---
 
-### Cargo Commands
-cargo and cargo near
-```bash
-cargo near build
-cargo test
+### Building and Testing
 
+```sh
+cargo near build
+cargo near build non-reproducible-wasm
+cargo near deploy build-reproducible-wasm
+
+
+cargo check
+cargo clippy
+cargo test
+cargo clean
+
+# deploy
 cargo near deploy build-reproducible-wasm <account-id>
 ```
 
