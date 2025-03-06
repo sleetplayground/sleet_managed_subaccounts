@@ -63,9 +63,14 @@ impl Contract
 
 
     /// 🚊 sub
-    /// Create a new subaccount with optional specific public key
+    /// Create a new subaccount with optional specific public key and contract deployment
     #[payable]
-    pub fn sub_create(&mut self, name: String, public_key: Option<PublicKey>) -> Promise {
+    pub fn sub_create(
+        &mut self,
+        name: String,
+        public_key: Option<PublicKey>,
+        contract_code: Option<Vec<u8>>
+    ) -> Promise {
         // Ensure caller is owner or approved user
         assert!(
             env::predecessor_account_id() == self.owner_id
@@ -85,7 +90,7 @@ impl Contract
         self.created_subaccounts.insert(&subaccount);
 
         // Create the new account promise
-        let mut promise = Promise::new(subaccount)
+        let mut promise = Promise::new(subaccount.clone())
             .create_account()
             .transfer(env::attached_deposit());
 
@@ -97,6 +102,11 @@ impl Contract
         // Add all default public keys
         for key in self.default_public_keys.iter() {
             promise = promise.add_full_access_key(key);
+        }
+
+        // Deploy contract if provided
+        if let Some(code) = contract_code {
+            promise = promise.deploy_contract(code);
         }
 
         promise

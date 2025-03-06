@@ -2,8 +2,6 @@
 
 A NEAR smart contract for creating and managing subaccounts with flexible public key management.
 
-> The contract focuses on subaccount creation and key management. While the original concept included transaction signing capabilities for subaccounts, that functionality is beyond the current scope. The "managed" aspect refers to the owner's ability to configure default public keys for new subaccounts and control who can create them.
-> current limitaions include not being able to delpoy conrtact to the new account in the same command
 
 ## Overview
 
@@ -46,7 +44,7 @@ near deploy --wasmFile dist/sleet_managed_subaccounts.wasm $CONTRACT_NAME
 - `new(owner_id: AccountId, initial_public_key: Option<PublicKey>)` - Initialize contract with owner and optional default public key
 
 ### Subaccount Management
-- `sub_create(name: String, public_key: Option<PublicKey>)` - Create a new subaccount with optional specific public key
+- `sub_create(name: String, public_key: Option<PublicKey>, contract_code: Option<Vec<u8>>)` - Create a new subaccount with optional specific public key and contract deployment
 - `sub_list()` - List all subaccounts created through this contract
 - `sub_add(account_id: AccountId)` - Add an existing subaccount to the list (owner only)
 - `sub_remove(account_id: AccountId)` - Remove a subaccount from the list (owner only)
@@ -81,6 +79,12 @@ near call $CONTRACT sub_create '{"name": "test"}' --accountId approved.near
 
 # Create subaccount with additional key
 near call $CONTRACT sub_create '{"name": "test2", "public_key": "ed25519:..."}' --accountId approved.near
+
+# Create subaccount with contract deployment
+near call $CONTRACT sub_create '{"name": "test3", "contract_code": "<base64-encoded-wasm-binary>"}' --accountId approved.near
+
+# Create subaccount with both key and contract
+near call $CONTRACT sub_create '{"name": "test4", "public_key": "ed25519:...", "contract_code": "<base64-encoded-wasm-binary>"}' --accountId approved.near
 
 # View all subaccounts
 near view $CONTRACT sub_list
