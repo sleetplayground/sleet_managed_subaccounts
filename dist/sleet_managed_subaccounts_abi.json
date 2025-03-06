@@ -148,7 +148,7 @@
       },
       {
         "name": "sub_create",
-        "doc": " 🚊 sub\n Create a new subaccount with optional specific public key",
+        "doc": " 🚊 sub\n Create a new subaccount with optional specific public key and contract deployment",
         "kind": "call",
         "modifiers": [
           "payable"
@@ -169,6 +169,20 @@
                   "string",
                   "null"
                 ]
+              }
+            },
+            {
+              "name": "contract_code",
+              "type_schema": {
+                "type": [
+                  "array",
+                  "null"
+                ],
+                "items": {
+                  "type": "integer",
+                  "format": "uint8",
+                  "minimum": 0.0
+                }
               }
             }
           ]
