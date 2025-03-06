@@ -28,7 +28,7 @@
       },
       {
         "name": "manage_add_user",
-        "doc": " 🧑‍💻 Admin\n Add an account to the list of approved subaccount creators",
+        "doc": " Add an account to the list of approved subaccount creators",
         "kind": "call",
         "params": {
           "serialization_type": "json",
@@ -131,6 +131,22 @@
         }
       },
       {
+        "name": "sub_add",
+        "doc": " Add a subaccount to the created subaccounts list (owner only)",
+        "kind": "call",
+        "params": {
+          "serialization_type": "json",
+          "args": [
+            {
+              "name": "account_id",
+              "type_schema": {
+                "$ref": "#/definitions/AccountId"
+              }
+            }
+          ]
+        }
+      },
+      {
         "name": "sub_create",
         "doc": " 🚊 sub\n Create a new subaccount with optional specific public key",
         "kind": "call",
@@ -176,6 +192,68 @@
               "$ref": "#/definitions/AccountId"
             }
           }
+        }
+      },
+      {
+        "name": "sub_list_protected",
+        "doc": " List all protected subaccounts",
+        "kind": "view",
+        "result": {
+          "serialization_type": "json",
+          "type_schema": {
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/AccountId"
+            }
+          }
+        }
+      },
+      {
+        "name": "sub_protect",
+        "doc": " Add a subaccount to the protected list (owner only)",
+        "kind": "call",
+        "params": {
+          "serialization_type": "json",
+          "args": [
+            {
+              "name": "account_id",
+              "type_schema": {
+                "$ref": "#/definitions/AccountId"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "name": "sub_remove",
+        "doc": " Remove a subaccount from the created subaccounts list (owner only)",
+        "kind": "call",
+        "params": {
+          "serialization_type": "json",
+          "args": [
+            {
+              "name": "account_id",
+              "type_schema": {
+                "$ref": "#/definitions/AccountId"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "name": "sub_unprotect",
+        "doc": " Remove a subaccount from the protected list (owner only)",
+        "kind": "call",
+        "params": {
+          "serialization_type": "json",
+          "args": [
+            {
+              "name": "account_id",
+              "type_schema": {
+                "$ref": "#/definitions/AccountId"
+              }
+            }
+          ]
         }
       }
     ],
