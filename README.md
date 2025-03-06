@@ -50,9 +50,9 @@ near deploy --wasmFile dist/sleet_managed_subaccounts.wasm $CONTRACT_NAME
 - `sub_list()` - List all subaccounts created through this contract
 - `sub_add(account_id: AccountId)` - Add an existing subaccount to the list (owner only)
 - `sub_remove(account_id: AccountId)` - Remove a subaccount from the list (owner only)
-- `sub_protect(account_id: AccountId)` - Add a subaccount to the protected list (owner only)
-- `sub_unprotect(account_id: AccountId)` - Remove a subaccount from the protected list (owner only)
-- `sub_list_protected()` - View all protected subaccounts
+- `sub_restrict(name: String)` - Add a name to the restricted list (owner only)
+- `sub_unrestrict(name: String)` - Remove a name from the restricted list (owner only)
+- `sub_list_restricted()` - View all restricted subaccount names
 
 ### Access Control
 - `manage_add_user(account_id: AccountId)` - Add an account to the list of approved subaccount creators
@@ -85,14 +85,14 @@ near call $CONTRACT sub_create '{"name": "test2", "public_key": "ed25519:..."}' 
 # View all subaccounts
 near view $CONTRACT sub_list
 
-# Add subaccount to protected list
-near call $CONTRACT sub_protect '{"account_id": "test.contract.near"}' --accountId owner.near
+# Add name to restricted list
+near call $CONTRACT sub_restrict '{"name": "test"}' --accountId owner.near
 
-# Remove subaccount from protected list
-near call $CONTRACT sub_unprotect '{"account_id": "test.contract.near"}' --accountId owner.near
+# Remove name from restricted list
+near call $CONTRACT sub_unrestrict '{"name": "test"}' --accountId owner.near
 
-# View protected subaccounts
-near view $CONTRACT sub_list_protected
+# View restricted names
+near view $CONTRACT sub_list_restricted
 
 # View approved users
 near view $CONTRACT manage_list_users

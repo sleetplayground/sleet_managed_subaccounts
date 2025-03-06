@@ -17,8 +17,8 @@ pub struct Contract {
     default_public_keys: UnorderedSet<PublicKey>,
     /// Set of created subaccounts
     created_subaccounts: UnorderedSet<AccountId>,
-    /// Set of protected subaccounts that cannot be removed
-    protected_subaccounts: UnorderedSet<AccountId>,
+    /// Set of restricted subaccount names that cannot be created
+    restricted_names: UnorderedSet<String>,
 }
 
 
@@ -43,7 +43,7 @@ impl Contract
             approved_users: UnorderedSet::new(b"a"),
             default_public_keys: UnorderedSet::new(b"k"),
             created_subaccounts: UnorderedSet::new(b"s"),
-            protected_subaccounts: UnorderedSet::new(b"p"),
+            restricted_names: UnorderedSet::new(b"r"),
         };
 
         if let Some(key) = initial_public_key {
@@ -75,6 +75,7 @@ impl Contract
 
         // Validate subaccount name
         assert!(!name.contains("."), "Subaccount name cannot contain dots");
+        assert!(!self.restricted_names.contains(&name), "This subaccount name is restricted");
 
         // Construct the full subaccount name
         let subaccount_id = format!("{}.{}", name, env::current_account_id());
@@ -109,10 +110,6 @@ impl Contract
     /// Remove a subaccount from the created subaccounts list (owner only)
     pub fn sub_remove(&mut self, account_id: AccountId) {
         self.assert_owner();
-        assert!(
-            !self.protected_subaccounts.contains(&account_id),
-            "Cannot remove protected subaccount"
-        );
         self.created_subaccounts.remove(&account_id);
     }
 
@@ -122,25 +119,21 @@ impl Contract
         self.created_subaccounts.insert(&account_id);
     }
 
-    /// Add a subaccount to the protected list (owner only)
-    pub fn sub_protect(&mut self, account_id: AccountId) {
+    /// Add a name to the restricted list (owner only)
+    pub fn sub_restrict(&mut self, name: String) {
         self.assert_owner();
-        assert!(
-            self.created_subaccounts.contains(&account_id),
-            "Account must be in created subaccounts list to be protected"
-        );
-        self.protected_subaccounts.insert(&account_id);
+        self.restricted_names.insert(&name);
     }
 
-    /// Remove a subaccount from the protected list (owner only)
-    pub fn sub_unprotect(&mut self, account_id: AccountId) {
+    /// Remove a name from the restricted list (owner only)
+    pub fn sub_unrestrict(&mut self, name: String) {
         self.assert_owner();
-        self.protected_subaccounts.remove(&account_id);
+        self.restricted_names.remove(&name);
     }
 
-    /// List all protected subaccounts
-    pub fn sub_list_protected(&self) -> Vec<AccountId> {
-        self.protected_subaccounts.to_vec()
+    /// List all restricted subaccount names
+    pub fn sub_list_restricted(&self) -> Vec<String> {
+        self.restricted_names.to_vec()
     }
 
     /// Add an account to the list of approved subaccount creators

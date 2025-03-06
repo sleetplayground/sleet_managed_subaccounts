@@ -195,33 +195,17 @@
         }
       },
       {
-        "name": "sub_list_protected",
-        "doc": " List all protected subaccounts",
+        "name": "sub_list_restricted",
+        "doc": " List all restricted subaccount names",
         "kind": "view",
         "result": {
           "serialization_type": "json",
           "type_schema": {
             "type": "array",
             "items": {
-              "$ref": "#/definitions/AccountId"
+              "type": "string"
             }
           }
-        }
-      },
-      {
-        "name": "sub_protect",
-        "doc": " Add a subaccount to the protected list (owner only)",
-        "kind": "call",
-        "params": {
-          "serialization_type": "json",
-          "args": [
-            {
-              "name": "account_id",
-              "type_schema": {
-                "$ref": "#/definitions/AccountId"
-              }
-            }
-          ]
         }
       },
       {
@@ -241,16 +225,32 @@
         }
       },
       {
-        "name": "sub_unprotect",
-        "doc": " Remove a subaccount from the protected list (owner only)",
+        "name": "sub_restrict",
+        "doc": " Add a name to the restricted list (owner only)",
         "kind": "call",
         "params": {
           "serialization_type": "json",
           "args": [
             {
-              "name": "account_id",
+              "name": "name",
               "type_schema": {
-                "$ref": "#/definitions/AccountId"
+                "type": "string"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "name": "sub_unrestrict",
+        "doc": " Remove a name from the restricted list (owner only)",
+        "kind": "call",
+        "params": {
+          "serialization_type": "json",
+          "args": [
+            {
+              "name": "name",
+              "type_schema": {
+                "type": "string"
               }
             }
           ]
