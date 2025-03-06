@@ -2,6 +2,10 @@
 
 A NEAR smart contract for creating and managing subaccounts with flexible public key management.
 
+> The contract focuses on subaccount creation and key management. While the original concept included transaction signing capabilities for subaccounts, that functionality is beyond the current scope. The "managed" aspect refers to the owner's ability to configure default public keys for new subaccounts and control who can create them.
+> current limitaions include not being able to delpoy conrtact to the new account in the same command, or cleaning up the list of created subaccounts.
+
+
 ## Overview
 
 This contract enables controlled creation and management of NEAR subaccounts with advanced public key management features. It allows approved users to create subaccounts and automatically adds predefined public keys to new subaccounts.
@@ -11,9 +15,6 @@ This contract enables controlled creation and management of NEAR subaccounts wit
 - Meme token launchpads
 - Trading with multiple accounts
 - Organizational account management
-
-> The contract focuses on subaccount creation and key management. While the original concept included transaction signing capabilities for subaccounts, that functionality is beyond the current scope. The "managed" aspect refers to the owner's ability to configure default public keys for new subaccounts and control who can create them.
-> current limitaions include not being able to delpoy conrtact to the new account in the same command, or cleaning up the list of created subaccounts.
 
 ## Features
 
