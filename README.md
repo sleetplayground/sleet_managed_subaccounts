@@ -3,8 +3,7 @@
 A NEAR smart contract for creating and managing subaccounts with flexible public key management.
 
 > The contract focuses on subaccount creation and key management. While the original concept included transaction signing capabilities for subaccounts, that functionality is beyond the current scope. The "managed" aspect refers to the owner's ability to configure default public keys for new subaccounts and control who can create them.
-> current limitaions include not being able to delpoy conrtact to the new account in the same command, or cleaning up the list of created subaccounts.
-
+> current limitaions include not being able to delpoy conrtact to the new account in the same command
 
 ## Overview
 
@@ -23,6 +22,8 @@ This contract enables controlled creation and management of NEAR subaccounts wit
 - Automatic addition of predefined public keys to new subaccounts
 - Flexible user management for subaccount creation permissions
 - Comprehensive key management for default subaccount access
+- Manual subaccount list management by owner
+- Protected subaccounts that cannot be removed from the list
 
 ## Building and Testing
 
@@ -47,6 +48,11 @@ near deploy --wasmFile dist/sleet_managed_subaccounts.wasm $CONTRACT_NAME
 ### Subaccount Management
 - `sub_create(name: String, public_key: Option<PublicKey>)` - Create a new subaccount with optional specific public key
 - `sub_list()` - List all subaccounts created through this contract
+- `sub_add(account_id: AccountId)` - Add an existing subaccount to the list (owner only)
+- `sub_remove(account_id: AccountId)` - Remove a subaccount from the list (owner only)
+- `sub_protect(account_id: AccountId)` - Add a subaccount to the protected list (owner only)
+- `sub_unprotect(account_id: AccountId)` - Remove a subaccount from the protected list (owner only)
+- `sub_list_protected()` - View all protected subaccounts
 
 ### Access Control
 - `manage_add_user(account_id: AccountId)` - Add an account to the list of approved subaccount creators
@@ -62,7 +68,7 @@ near deploy --wasmFile dist/sleet_managed_subaccounts.wasm $CONTRACT_NAME
 
 ```bash
 # Initialize contract
-near call $CONTRACT new '{"owner_id": "owner.near", "initial_public_key": "ed25519:..."}'  --accountId owner.near
+near call $CONTRACT new '{"owner_id": "owner.near", "initial_public_key": "ed25519:..."}' --accountId owner.near
 
 # Add approved user
 near call $CONTRACT manage_add_user '{"account_id": "approved.near"}' --accountId owner.near
@@ -79,6 +85,15 @@ near call $CONTRACT sub_create '{"name": "test2", "public_key": "ed25519:..."}' 
 # View all subaccounts
 near view $CONTRACT sub_list
 
+# Add subaccount to protected list
+near call $CONTRACT sub_protect '{"account_id": "test.contract.near"}' --accountId owner.near
+
+# Remove subaccount from protected list
+near call $CONTRACT sub_unprotect '{"account_id": "test.contract.near"}' --accountId owner.near
+
+# View protected subaccounts
+near view $CONTRACT sub_list_protected
+
 # View approved users
 near view $CONTRACT manage_list_users
 
@@ -86,8 +101,7 @@ near view $CONTRACT manage_list_users
 near view $CONTRACT manage_list_keys
 
 # Note: The subaccount list is maintained automatically by the contract.
-# If a subaccount is deleted, it will remain in the list
-
+# Protected subaccounts cannot be removed from the list.
 ```
 
 ---

@@ -17,6 +17,8 @@ pub struct Contract {
     default_public_keys: UnorderedSet<PublicKey>,
     /// Set of created subaccounts
     created_subaccounts: UnorderedSet<AccountId>,
+    /// Set of protected subaccounts that cannot be removed
+    protected_subaccounts: UnorderedSet<AccountId>,
 }
 
 
@@ -41,9 +43,9 @@ impl Contract
             approved_users: UnorderedSet::new(b"a"),
             default_public_keys: UnorderedSet::new(b"k"),
             created_subaccounts: UnorderedSet::new(b"s"),
+            protected_subaccounts: UnorderedSet::new(b"p"),
         };
 
-        // If an initial public key is provided, add it to the default keys
         if let Some(key) = initial_public_key {
             contract.default_public_keys.insert(&key);
         }
@@ -104,16 +106,42 @@ impl Contract
         self.created_subaccounts.to_vec()
     }
 
+    /// Remove a subaccount from the created subaccounts list (owner only)
+    pub fn sub_remove(&mut self, account_id: AccountId) {
+        self.assert_owner();
+        assert!(
+            !self.protected_subaccounts.contains(&account_id),
+            "Cannot remove protected subaccount"
+        );
+        self.created_subaccounts.remove(&account_id);
+    }
 
+    /// Add a subaccount to the created subaccounts list (owner only)
+    pub fn sub_add(&mut self, account_id: AccountId) {
+        self.assert_owner();
+        self.created_subaccounts.insert(&account_id);
+    }
 
+    /// Add a subaccount to the protected list (owner only)
+    pub fn sub_protect(&mut self, account_id: AccountId) {
+        self.assert_owner();
+        assert!(
+            self.created_subaccounts.contains(&account_id),
+            "Account must be in created subaccounts list to be protected"
+        );
+        self.protected_subaccounts.insert(&account_id);
+    }
 
+    /// Remove a subaccount from the protected list (owner only)
+    pub fn sub_unprotect(&mut self, account_id: AccountId) {
+        self.assert_owner();
+        self.protected_subaccounts.remove(&account_id);
+    }
 
-
-
-
-
-
-    /// 🧑‍💻 Admin
+    /// List all protected subaccounts
+    pub fn sub_list_protected(&self) -> Vec<AccountId> {
+        self.protected_subaccounts.to_vec()
+    }
 
     /// Add an account to the list of approved subaccount creators
     pub fn manage_add_user(&mut self, account_id: AccountId) {
