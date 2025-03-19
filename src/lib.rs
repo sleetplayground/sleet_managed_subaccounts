@@ -6,6 +6,12 @@ use std::str::FromStr;
 
 
 
+
+
+
+
+
+
 #[near_bindgen]
 #[derive(BorshDeserialize, BorshSerialize, PanicOnDefault)]
 pub struct Contract {
@@ -29,10 +35,21 @@ pub struct Contract {
 
 
 
+
+
+
+
+
+
 #[near_bindgen]
 impl Contract
  // opening bracket
 {
+
+
+
+
+
 
 
     /// 👋 init
@@ -52,6 +69,11 @@ impl Contract
 
         contract
     }
+
+
+
+
+
 
 
 
@@ -193,5 +215,15 @@ impl Contract
 
 
 
+
+
+
+
+
+
+
+
+
+    
 
 } // closing bracket
