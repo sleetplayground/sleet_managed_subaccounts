@@ -23,19 +23,28 @@ This contract enables controlled creation and management of NEAR subaccounts wit
 - Manual subaccount list management by owner
 - Protected subaccounts that cannot be removed from the list
 
-## Building and Testing
+## Build and Test
 
-```sh
-cargo build --target wasm32-unknown-unknown --release
-# use build script
-./build.sh
-
-# development commands
+```bash
+# CARGO COMMANDS
 cargo check
+cargo test
 cargo clean
 
-# deploy
-near deploy --wasmFile dist/sleet_managed_subaccounts.wasm $CONTRACT_NAME
+# CUSTOM SCRIPTS
+./build_cargo.sh
+./build_reproducible.sh
+./clean.sh # Just cleans the .wasm files and the custom build directories
+```
+
+###  How to Deploy?
+
+```bash
+# Deploy to testnet
+near deploy <your-account>.testnet build_near/sleet_managed_subaccounts.wasm
+
+# For mainnet deployment
+near deploy <your-account>.near build_near/sleet_managed_subaccounts.wasm
 ```
 
 ## Contract Methods
