@@ -3,4 +3,4 @@
 
 # RUST
 /target
-# /dist
+/build_cargo
